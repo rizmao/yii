@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use backend\models\ItemCategory as ModelsItemCategory;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -15,7 +16,10 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
-
+use frontend\models\Item;
+use yii\data\Pagination;
+use frontend\models\ItemCategory;
+use frontend\models\User;
 /**
  * Site controller
  */
@@ -30,6 +34,14 @@ class SiteController extends Controller
             'access' => [
                 'class' => AccessControl::className(),
                 'only' => ['logout', 'signup'],
+                // 'lastModified'=>function ($action , $params){
+                //     $query = new \yii\db\Query();
+                //     return $query->form('item')->max('created_at');
+
+                // },
+                // 'etagSeed'=>function($action,$params){
+                //     $user = $this->findModel(Yii::$app->request->get('id'));
+                // }
                 'rules' => [
                     [
                         'actions' => ['signup'],
@@ -49,6 +61,11 @@ class SiteController extends Controller
                     'logout' => ['post'],
                 ],
             ],
+        [
+            'class' => 'yii\filters\PageCache',
+            'only' => ['index'],
+            'duration' => 60,
+        ]
         ];
     }
 
@@ -75,7 +92,33 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        // $model=Item::find()->all();       
+    // );
+        
+        $query = Item::find();
+        $countQuery=Item::find()->count();
+        $pages=new Pagination([
+            'totalCount'=>$countQuery,
+            'pageSize'=> 5
+        ]);
+
+        $model = $query->offset($pages->offset)
+                ->limit($pages->limit)
+                ->all();
+
+        $categories = ItemCategory::find()->all();
+        $dataCache = Yii::$app->cache->set('username', isset(Yii::$app->user->identity->username)?Yii::$app->user->identity->username:"");
+        $dataCache=Yii::$app->cache->get('username');
+
+        return $this->render('index',[
+            'model'=>$model,
+            'pages'=>$pages,
+            'categories'=>$categories,
+            'caches'=>$dataCache
+        ]);
+    
+
+
     }
 
     /**
@@ -255,5 +298,25 @@ class SiteController extends Controller
         return $this->render('resendVerificationEmail', [
             'model' => $model
         ]);
+    }
+
+    public function actionCheckout()
+    {
+        if (Yii::$app->user->isGuest) {
+            Yii::$app->session->setFlash('error', 'Login terlebih dahulu');
+            return $this->redirect(['site/login']);
+        } else {
+            return $this->render('checkout');
+        }
+    }
+   
+    public function actionFragmentCaching()
+    {
+        $user = new User();
+        $user->username = "Test Cache Username";
+        $user->email = "testcache@gmail.com";
+        $user->save();
+        $models = User::find()->all();
+        return $this->render('cachedview' , ['models' => $models]);
     }
 }

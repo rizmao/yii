@@ -5,6 +5,7 @@ namespace frontend\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\behaviors\BlameableBehavior;
+use yii\db\ActiveRecord;
 /**
  * This is the model class for table "item".
  *
@@ -17,7 +18,7 @@ use yii\behaviors\BlameableBehavior;
  * @property int|null $created_by
  * @property int|null $updated_by
  */
-class Item extends \yii\db\ActiveRecord
+class Item extends ActiveRecord
 {
     public function behaviors()
     {
@@ -60,6 +61,7 @@ class Item extends \yii\db\ActiveRecord
             'updated_at' => 'Updated At',
             'created_by' => 'Created By',
             'updated_by' => 'Updated By',
+            'img_url'=>'img url',
         ];
     }
 }

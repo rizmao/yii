@@ -38,14 +38,17 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        
+
+        'authManager'=>[
+            'class' =>'yii\rbac\DbManager',
+            'defaultRoles'=>['guest'],
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        
     ],
     'params' => $params,
 ];

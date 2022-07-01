@@ -8,7 +8,6 @@ $params = array_merge(
 
 return [
     'id' => 'app-frontend',
-    'defaultRoute'=>'site/index',
     'name'=>'Toko Baru',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],

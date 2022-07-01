@@ -4,10 +4,13 @@ namespace frontend\controllers;
 
 use frontend\models\Item;
 use frontend\models\ItemSearch;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
+use backend\models\itemCategory;
+
 
 /**
  * ItemController implements the CRUD actions for Item model.
@@ -146,5 +149,20 @@ class ItemController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionFilter()
+    {
+        $db = Yii::$app->db;
+        $request = Yii::$app->request;
+        $rows = $db->createCommand("SELECT * FROM item WHERE category_id = :category_id")
+                    ->bindValue(':category_id', $_GET['category_id'])
+                    ->queryAll();
+        $categories = ItemCategory::find()->all();
+
+        return $this->render('filter', [
+            'rows' => $rows,
+            'categories' => $categories
+        ]);
     }
 }

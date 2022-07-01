@@ -4,6 +4,7 @@ namespace backend\models;
 
 use Yii;
 use yii\web\UploadedFile;
+use yii\db\ActiveRecord;
 /**
  * This is the model class for table "item".
  *
